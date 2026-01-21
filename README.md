@@ -1,6 +1,6 @@
 <div align="center">
   <h1 align="center">
-    <img src="icon.png" width="200" alt="ok-ef logo"/>
+    <img src="icons/icon.png" width="200" alt="ok-ef logo"/>
     <br/>
     ok-ef
   </h1> 
