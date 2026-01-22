@@ -51,14 +51,19 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
                     # use skill
                     start = time.time()
                     while time.time() - start < 3:
-                        if self.get_skill_bar_count() == current_count:
+                        count = self.get_skill_bar_count()
+                        if count == current_count:
                             self.send_key(self.skill_sequence[i], after_sleep=0.1)
-                        elif self.get_skill_bar_count() < current_count:
+                        elif count < 0:
+                            self.log_debug('skill -1 when using skills {}'.format(count))
+                            break
+                        elif count < current_count:
                             self.log_debug('use skill success')
                             break
+                        self.next_frame()
             else:
                 self.send_key("9",  after_sleep=0.1)
-            self.sleep(0.1)
+            self.sleep(0.01)
 
     def use_ult(self):
         ults = ['1', '2', '3', '4']
