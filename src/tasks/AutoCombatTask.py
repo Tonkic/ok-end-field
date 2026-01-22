@@ -20,7 +20,7 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
         self.skill_sequence = ["2", "1", "1"]
 
     def run(self):
-        self.log_debug('AutoCombatTask.run()')
+        # self.log_debug('AutoCombatTask.run()')
         bar_count = self.get_skill_bar_count()
         if self.get_skill_bar_count() < 0 or not self.in_team():
             return
@@ -31,6 +31,7 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
             if skill_count < 0:
                 self.log_info("自动战斗结束!", notify=self.in_bg())
                 self.screenshot('out_of_combat')
+                self.sleep(3)
                 break
             elif self.use_e_skill():
                 continue
@@ -63,7 +64,7 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
                             break
                         self.next_frame()
             else:
-                self.send_key("6",  after_sleep=0.1)
+                self.click(after_sleep=1)
             self.sleep(0.01)
 
     def use_ult(self):
@@ -105,30 +106,40 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
 
     def check_is_pure_color_in_4k(self, x1, y1, x2, y2, color_range=None):
         bar = self.frame[self.height_of_screen(y1 / 2160):self.height_of_screen(y2 / 2160),
-                    self.width_of_screen(x1 / 3840):self.width_of_screen(x2 / 3840)]
-
+              self.width_of_screen(x1 / 3840):self.width_of_screen(x2 / 3840)]
         if bar.size == 0:
             return False
 
-        first_column = bar[:, 0:1]
-        diff = np.abs(bar.astype(np.int16) - first_column.astype(np.int16))
-        is_pure = np.all(diff <= 2)
+        height, width, _ = bar.shape
 
-        if not is_pure:
-            return False
+        # Iterate through every horizontal line (row) in the bar
+        for i in range(height):
+            row_pixels = bar[i]  # Shape is (Width, 3)
 
-        if color_range:
-            b, g, r = bar[0, 0]
-            if not (color_range['r'][0] <= r <= color_range['r'][1]): return False
-            if not (color_range['g'][0] <= g <= color_range['g'][1]): return False
-            if not (color_range['b'][0] <= b <= color_range['b'][1]): return False
+            # Find unique colors and their counts for this specific row
+            unique_colors, counts = np.unique(row_pixels, axis=0, return_counts=True)
+
+            # Find the most frequent color in this row
+            most_frequent_index = np.argmax(counts)
+            dominant_count = counts[most_frequent_index]
+            dominant_color = unique_colors[most_frequent_index]
+
+            # Check if the dominant color constitutes at least 90% of this row's width
+            if (dominant_count / width) < 0.9:
+                return False
+            # If color_range is provided, ensure this row's dominant color fits the range
+            if color_range:
+                b, g, r = dominant_color
+                if not (color_range['r'][0] <= r <= color_range['r'][1]): return False
+                if not (color_range['g'][0] <= g <= color_range['g'][1]): return False
+                if not (color_range['b'][0] <= b <= color_range['b'][1]): return False
 
         return True
         
 
 yellow_skill_color = {
     'r': (230, 255),  # Red range
-    'g': (200, 255),  # Green range
+    'g': (180, 255),  # Green range
     'b': (0, 85)  # Blue range
 }
 
