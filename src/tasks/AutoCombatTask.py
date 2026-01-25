@@ -23,7 +23,7 @@ class AutoCombatTask(BaseEfTask, TriggerTask):
             "后台结束战斗通知": True
         })
         self.config_description.update({
-            "技能释放": "满技能时, 开始释放技能, 如123, 建议只放3个节能",
+            "技能释放": "满技能时, 开始释放技能, 如123, 建议只放3个技能",
             "启动技能点数": "当技能点达到该数值时，开始执行技能序列, 1-3",
         })
         self.lv_regex = re.compile(r"(?i)lv|\d{2}")
