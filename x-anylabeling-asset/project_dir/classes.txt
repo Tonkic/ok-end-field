@@ -30,3 +30,5 @@ e
 price_down
 price_up
 assist_friend
+ticket_valley
+ticket_wuling
